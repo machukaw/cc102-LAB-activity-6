@@ -1,0 +1,192 @@
+#include <iostream>
+#include <string>
+#include <windows.h>
+#include <limits>
+
+using namespace std;
+
+struct Student {
+    string id;
+    string firstName;
+    string lastName;
+    string course;
+    double gpa;
+};
+
+void displayMenu() {
+    cout<< "-Menu-" << endl;
+    cout<< "[1] Add Student" <<endl;
+    cout<< "[2] Edit Student" <<endl;
+    cout<< "[3] Delete Student" <<endl;
+    cout<< "[4] View Student" <<endl;
+    cout<< "[5] Exit Program" <<endl;
+}
+
+void clearScreen() {
+    system("cls");
+}
+
+int findStudent(Student students[], int size, const string& id) {
+    for (int i = 0; i < size; ++i) {
+        if (students[i].id == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool isDuplicateId(Student students[], int size, const string& id) {
+    return findStudent(students, size, id) != -1;
+}
+
+void addStudent(Student students[], int& size) {
+    Student newStudent;
+    cout << "Enter Student ID: ";
+    cin >> newStudent.id;
+
+    if (isDuplicateId(students, size, newStudent.id)) {
+        cout << "Duplicate ID. Student not added." << endl;
+        return;
+    }
+
+    cout<< "Enter First Name: ";
+    cin>> newStudent.firstName;
+    cout<< "Enter Last Name: ";
+    cin>> newStudent.lastName;
+    cout<< "Enter Course: ";
+    cin>> newStudent.course;
+    cout<< "Enter GPA: ";
+    cin>> newStudent.gpa;
+
+    students[size] = newStudent;
+    size++;
+
+    cout<< "Student added successfully." <<endl;
+}
+
+void editStudent(Student students[], int size) {
+    string id;
+    cout<< "Enter Student ID to edit: ";
+    cin>> id;
+
+    int index = findStudent(students, size, id);
+    if (index == -1) {
+        cout << "Student not found." <<endl;
+        return;
+    }
+
+    cout<< "Enter First Name: ";
+    cin>> students[index].firstName;
+    cout<< "Enter Last Name: ";
+    cin>> students[index].lastName;
+    cout<< "Enter Course: ";
+    cin>> students[index].course;
+    cout<< "Enter GPA: ";
+    cin>> students[index].gpa;
+
+    cout<< "Student edited successfully." <<endl;
+}
+
+void deleteStudent(Student students[], int& size) {
+    string id;
+    cout<< "Enter Student ID to delete: ";
+    cin>> id;
+
+    int index = findStudent(students, size, id);
+    if (index == -1) {
+        cout<< "Student not found." <<endl;
+        return;
+    }
+
+    for (int i = index; i < size - 1; ++i) {
+        students[i] = students[i + 1];
+    }
+    size--;
+
+    cout<< "Student deleted successfully." <<endl;
+}
+
+void viewStudents(Student students[], int size) {
+    if (size == 0) {
+        cout<< "No students recorded." <<endl;
+        return;
+    }
+
+    cout<< "Select viewing options:" <<endl;
+    cout<< "[1] Alphabetically" <<endl;
+    cout<< "[2] GPA" <<endl;
+
+    int option;
+    cin >> option;
+
+    if (option == 1) {
+        for (int i = 0; i < size - 1; ++i) {
+            for (int j = 0; j < size - i - 1; ++j) {
+                if (students[j].lastName > students[j + 1].lastName) {
+                    swap(students[j], students[j + 1]);
+                }
+            }
+        }
+    } else if (option == 2) {
+        for (int i = 0; i < size - 1; ++i) {
+            for (int j = 0; j < size - i - 1; ++j) {
+                if (students[j].gpa > students[j + 1].gpa) {
+                    swap(students[j], students[j + 1]);
+                }
+            }
+        }
+    } else {
+        cout<< "Invalid option." <<endl;
+        return;
+    }
+
+    for (int i = 0; i < size; ++i) {
+        cout<< "ID: " << students[i].id <<endl;
+        cout<< "Name: " << students[i].firstName << " " << students[i].lastName <<endl;
+        cout<< "Course: " << students[i].course <<endl;
+        cout<< "GPA: " << students[i].gpa <<endl;
+        cout<< endl;
+    }
+}
+
+int main() {
+    Student students[100];
+    int size = 0;
+    int choice;
+
+    do {
+        displayMenu();
+        cout<< "Select option: ";
+        cin>> choice;
+
+        clearScreen();
+
+        switch (choice) {
+            case 1:
+                addStudent(students, size);
+                break;
+            case 2:
+                editStudent(students, size);
+                break;
+            case 3:
+                deleteStudent(students, size);
+                break;
+            case 4:
+                viewStudents(students, size);
+                break;
+            case 5:
+                cout<< "Exiting program."<< endl;
+                break;
+            default:
+                cout<< "Invalid choice."<< endl;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout<< "Press Enter to continue...";
+        cin.get();
+        clearScreen();
+
+    } while (choice != 5);
+
+    return 0;
+}
